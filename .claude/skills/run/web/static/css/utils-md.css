@@ -1,0 +1,409 @@
+/* ── Scrollable ───────────────────────────────────── */
+.scroll-area {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ── Utility ──────────────────────────────────────── */
+.hidden { display: none !important; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.text-muted { color: #86868b; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.fw-600 { font-weight: 600; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-8 { gap: 8px; }
+
+/* ── Agent Meta Card (YAML frontmatter) ──────────── */
+.agent-meta-card {
+  background: rgba(0,122,255,0.05);
+  border: 0.5px solid rgba(0,122,255,0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.meta-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 4px;
+}
+
+.meta-desc {
+  font-size: 12px;
+  color: #636366;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.meta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.meta-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.05);
+  color: #636366;
+  font-weight: 500;
+}
+
+.meta-tag-status {
+  background: rgba(52,199,89,0.12);
+  color: #248a3d;
+}
+
+/* ── Markdown Body Rendering ─────────────────────── */
+.agent-md-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1d1d1f;
+}
+
+.agent-md-body h1, .agent-md-body h2, .agent-md-body h3 {
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.agent-md-body h1 { font-size: 16px; }
+.agent-md-body h2 { font-size: 14px; color: #3a3a3c; }
+.agent-md-body h3 { font-size: 13px; color: #3a3a3c; }
+
+.agent-md-body p { margin-bottom: 8px; }
+
+.agent-md-body ul, .agent-md-body ol {
+  margin: 0 0 8px 16px;
+}
+
+.agent-md-body li { margin-bottom: 2px; }
+
+.agent-md-body code {
+  font-family: 'SF Mono', SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  background: rgba(0,0,0,0.05);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.agent-md-body pre {
+  background: rgba(0,0,0,0.03);
+  border: 0.5px solid rgba(0,0,0,0.06);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.agent-md-body pre code {
+  background: none;
+  padding: 0;
+  font-size: 11px;
+}
+
+.agent-md-body blockquote {
+  border-left: 3px solid rgba(0,122,255,0.3);
+  padding-left: 12px;
+  color: #636366;
+  margin-bottom: 8px;
+}
+
+.agent-md-body strong { font-weight: 600; }
+.agent-md-body em { font-style: italic; color: #3a3a3c; }
+
+.agent-md-body hr {
+  border: none;
+  border-top: 0.5px solid rgba(0,0,0,0.08);
+  margin: 12px 0;
+}
+
+/* ── Pending Task Edit Area ──────────────────────── */
+.task-edit-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 8px 10px;
+  border: 0.5px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.6);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 8px;
+}
+.task-edit-textarea:focus {
+  border-color: rgba(0,122,255,0.4);
+  background: rgba(255,255,255,0.85);
+}
+
+/* ── Center Hero Image ───────────────────────────── */
+.center-hero-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+  padding-top: 28px;
+}
+
+.center-hero-img {
+  display: block;
+  width: 72%;
+  height: auto;
+  border-radius: 6px;
+  opacity: 0.88;
+  cursor: default;
+  transition: opacity 0.2s ease;
+}
+
+.center-hero-img:hover {
+  opacity: 1;
+}
+
+.hero-quote-bubble {
+  position: absolute;
+  top: 32px;
+  left: 20%;
+  transform: translateX(0) translateY(4px);
+  background: rgba(29, 29, 31, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #f5f5f7;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  padding: 8px 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 20;
+}
+
+.hero-quote-bubble.visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
+}
+
+/* ── Task Title (replaces .task-content) ────────── */
+.task-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1d1d1f;
+  line-height: 1.4;
+}
+
+/* ── Task Timeline ───────────────────────────────── */
+.task-timeline {
+  margin: 6px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tl-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding: 3px 0;
+}
+
+.tl-arrow {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.tl-dispatch .tl-arrow { color: #0a84ff; }
+.tl-done    .tl-arrow { color: #30d158; }
+.tl-other   .tl-arrow { color: #aeaeb2; }
+
+.tl-agent {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.05);
+  color: #3a3a3c;
+}
+
+.tl-dispatch .tl-agent { background: rgba(10,132,255,0.08); color: #0a84ff; }
+.tl-done    .tl-agent { background: rgba(48,209,88,0.08);  color: #248a3d; }
+
+/* ── Timeline Phase Divider ──────────────────────── */
+.tl-phase-divider {
+  text-align: center;
+  font-size: 10px;
+  color: rgba(200, 150, 12, 0.6);
+  letter-spacing: 0.1em;
+  margin: 6px 0 4px;
+  border-top: 1px dashed rgba(200, 150, 12, 0.2);
+  padding-top: 6px;
+}
+
+/* ── Verdict Timeline Item ────────────────────────── */
+.tl-verdict .tl-arrow { color: #c8960c; font-size: 13px; }
+.tl-verdict .tl-agent-tester { color: #c8960c; background: rgba(200,150,12,0.08); }
+
+.tl-action {
+  font-size: 11px;
+  color: #aeaeb2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tl-detail {
+  flex: 1;
+  color: #3a3a3c;
+  font-size: 12.5px;
+}
+
+.tl-ts {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #c7c7cc;
+}
+
+/* ── Raw Input Collapsible ───────────────────────── */
+.raw-input-block {
+  margin: 6px 0;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.025);
+  border: 0.5px solid rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.raw-input-toggle {
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #8e8e93;
+  padding: 5px 10px;
+  user-select: none;
+  list-style: none;
+}
+
+.raw-input-toggle::-webkit-details-marker { display: none; }
+.raw-input-toggle::before { content: '▶ '; font-size: 9px; }
+details[open] .raw-input-toggle::before { content: '▼ '; }
+
+.raw-input-content {
+  font-size: 12px;
+  color: #636366;
+  white-space: pre-wrap;
+  padding: 6px 10px 8px;
+  border-top: 0.5px solid rgba(0,0,0,0.05);
+  line-height: 1.5;
+}
+
+/* ── Memory Group & Badge ────────────────────────── */
+.memory-group {
+  margin-bottom: 12px;
+}
+
+.memory-group-title {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.memory-category-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 0.5px solid;
+  letter-spacing: 0.02em;
+}
+
+.memory-item {
+  position: relative;
+  padding-right: 28px;
+}
+
+.memory-delete-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,59,48,0.1);
+  color: #ff3b30;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  padding: 0;
+}
+
+.memory-item:hover .memory-delete-btn {
+  opacity: 1;
+}
+
+.memory-delete-btn:hover {
+  background: rgba(255,59,48,0.2);
+}
+
+/* ── Agent Status Toggle ─────────────────────────── */
+.agent-status-toggle {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: #e0e0e0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+  border: none;
+  padding: 0;
+  outline: none;
+}
+
+.agent-status-toggle.active {
+  background: #34c759;
+}
+
+.agent-status-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.agent-status-toggle.active::after {
+  transform: translateX(12px);
+}
+
+.agent-card.inactive {
+  opacity: 0.55;
+}
+

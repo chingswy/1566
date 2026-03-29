@@ -1,0 +1,469 @@
+/* ── Agent Cards (vertical list in left panel) ───── */
+.agents-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agent-card {
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.agent-card .agent-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.agent-card-add {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #86868b;
+  border: 1.5px dashed rgba(0,0,0,0.1);
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.agent-card-add:hover {
+  color: #1d1d1f;
+  border-color: rgba(0,0,0,0.2);
+}
+
+/* ── Status Dot Icons (CSS-drawn) ────────────────── */
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.status-dot-pending {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid #f59e0b;
+  border-radius: 50%;
+}
+
+.status-dot-in_progress {
+  width: 10px;
+  height: 10px;
+  background: #007aff;
+  border-radius: 50%;
+  animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.status-dot-completed {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', STKaiti, KaiTi, serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #b22222;
+  line-height: 1;
+}
+
+.status-dot-completed::before {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border-radius: 0;
+}
+
+.status-dot-completed::after {
+  display: none;
+}
+
+.status-dot-failed {
+  width: 10px;
+  height: 10px;
+  position: relative;
+}
+
+.status-dot-failed::before,
+.status-dot-failed::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 1.5px;
+  background: #ff3b30;
+  border-radius: 1px;
+}
+
+.status-dot-failed::before { transform: translate(-50%,-50%) rotate(45deg); }
+.status-dot-failed::after { transform: translate(-50%,-50%) rotate(-45deg); }
+
+.status-dot-cancelled,
+.status-dot-skipped {
+  width: 8px;
+  height: 1.5px;
+  background: #8e8e93;
+  border-radius: 1px;
+}
+
+/* ── Avatar ──────────────────────────────────────── */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.ink-avatar {
+  font-family: "Ma Shan Zheng", "ZCOOL KuaiLe", "Noto Serif SC", "Songti SC", "STKaiti", "KaiTi", serif;
+  font-weight: 400;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.avatar-sm { width: 36px; height: 36px; font-size: 18px; }
+.avatar-lg { width: 48px; height: 48px; font-size: 24px; }
+
+/* ── Agent Detail Page ───────────────────────────── */
+.agent-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  height: 100vh;
+  overflow-y: auto;
+  /* slide + fade transition */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateX(40px);
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  z-index: 10;
+  background: #f5f5f7;
+}
+
+.agent-page.visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.agent-page-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0 16px;
+}
+
+.agent-page-back {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #007aff;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.agent-page-back:hover { background: rgba(0,122,255,0.08); }
+
+.agent-page-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+}
+
+.agent-page-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agent-page-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-page-role {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.alias-edit-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.45;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity 0.15s;
+}
+.alias-edit-icon:hover { opacity: 1; }
+
+.alias-edit-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.alias-input {
+  font-size: 13px;
+  padding: 4px 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.8);
+  outline: none;
+  width: 160px;
+}
+.alias-input:focus { border-color: #0071e3; }
+
+.agent-role-label {
+  font-size: 11px;
+  color: rgba(0,0,0,0.4);
+  text-align: center;
+  margin-top: 2px;
+}
+
+.form-hint {
+  font-size: 11px;
+  color: rgba(0,0,0,0.38);
+  font-weight: 400;
+}
+
+.agent-page-body {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.agent-page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.agent-section {
+  margin-bottom: 20px;
+}
+
+.agent-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #86868b;
+  margin-bottom: 8px;
+}
+
+/* ── Agent Page Two-Column Layout ────────────────── */
+.agent-page-columns {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  min-height: 0;
+}
+
+.agent-col-left {
+  flex: 3;
+  min-width: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 160px);
+}
+
+.agent-col-right {
+  flex: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: calc(100vh - 160px);
+  overflow: hidden;
+}
+
+/* Memory section — dominant, fills available space */
+.agent-section-memory {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.agent-section-memory .agent-page-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Records section — secondary, fixed compact area */
+.agent-section-records {
+  flex: 0 0 auto;
+  max-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-section-records .agent-page-body {
+  overflow-y: auto;
+  max-height: 210px;
+}
+
+/* ── Definition Section Title Row ────────────────── */
+.agent-section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.agent-section-title-row .agent-section-title {
+  margin-bottom: 0;
+}
+
+/* ── Edit Button (Apple-style pill) ──────────────── */
+.btn-edit {
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 0.5px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.6);
+  color: #007aff;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.btn-edit:hover { background: rgba(0,122,255,0.06); border-color: rgba(0,122,255,0.2); }
+.btn-edit:active { opacity: 0.7; }
+
+/* ── Definition Browse View ──────────────────────── */
+.agent-definition-view {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1d1d1f;
+  word-break: break-word;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.5);
+  border: 0.5px solid rgba(0,0,0,0.04);
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+}
+
+.agent-definition-edit {
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Timeline (Records) ──────────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 0.5px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot {
+  position: absolute;
+  left: -20px;
+  top: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c7c7cc;
+  border: 1.5px solid #f5f5f7;
+  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.08);
+  transition: background 0.15s ease;
+}
+
+.timeline-item:first-child .timeline-dot {
+  background: #007aff;
+}
+
+.timeline-body {
+  min-width: 0;
+}
+
+/* ── Agent Definition Editor ──────────────────────── */
+.agent-editor {
+  width: 100%;
+  min-height: 200px;
+  font-family: 'SF Mono', SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 12px;
+  border: 0.5px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.5);
+  color: #1d1d1f;
+  resize: vertical;
+}
+
+.agent-editor:focus {
+  outline: none;
+  border-color: rgba(0,0,0,0.2);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+}

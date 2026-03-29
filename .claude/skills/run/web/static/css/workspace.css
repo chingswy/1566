@@ -1,0 +1,319 @@
+/* ── Mobile Responsive Layout (max-width: 768px) ── */
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
+
+  .main-layout {
+    flex-direction: column;
+    height: auto;
+    padding: 8px 12px 0;
+  }
+
+  .panel {
+    overflow-y: visible;
+    height: auto;
+    padding: 12px;
+  }
+
+  .panel-left {
+    order: 2;
+    border-right: none;
+    border-top: 0.5px solid rgba(0,0,0,0.06);
+    min-width: 0;
+  }
+
+  .panel-center {
+    order: 1;
+    min-width: 0;
+  }
+
+  .panel-right {
+    order: 3;
+    border-left: none;
+    border-top: 0.5px solid rgba(0,0,0,0.06);
+    min-width: 0;
+  }
+
+  .agent-page {
+    position: static;
+    height: auto;
+    overflow-y: visible;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .agent-page.visible {
+    transform: none;
+  }
+
+  .agent-page-columns {
+    flex-direction: column;
+  }
+
+  .agent-col-left,
+  .agent-col-right {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .agent-definition-view {
+    max-height: none;
+  }
+
+  .agent-section-records {
+    max-height: none;
+  }
+
+  .agent-section-records .agent-page-body {
+    max-height: none;
+  }
+}
+
+/* ── Agent Workspace (朝堂式布局) ─────────────────── */
+.workspace {
+  position: relative;
+  padding: 24px 16px 20px;
+  min-height: 200px;
+  overflow: visible;
+}
+
+.workspace-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.workspace-line {
+  stroke: rgba(139,37,0,0.12);
+  stroke-width: 1;
+  fill: none;
+  transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.workspace-line.line-busy {
+  stroke: rgba(139,37,0,0.28);
+  stroke-width: 1.5;
+}
+
+.workspace-chief-assistant-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.workspace-workers-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* ── Tester 行 ─────────────────────────────────────── */
+.workspace-tester-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(139, 37, 0, 0.15);
+}
+
+/* tester 头像金色印章边框 */
+.workspace-tester-row .ws-agent .ink-avatar {
+  box-shadow: 0 0 0 2px #c8960c, 0 2px 8px rgba(200, 150, 12, 0.3);
+}
+
+/* worker → tester 虚线样式 */
+.workspace-line-to-tester {
+  stroke: rgba(200, 150, 12, 0.25);
+  stroke-width: 1;
+  fill: none;
+  transition: stroke 0.3s ease;
+}
+
+.workspace-scroll-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ── Workspace Agent Node ─────────────────────────── */
+.ws-agent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  padding: 6px;
+  position: relative;
+}
+
+.ws-agent .ink-avatar {
+  width: 52px;
+  height: 52px;
+  font-size: 26px;
+}
+
+.ws-agent:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Workspace Agent States ───────────────────────── */
+
+/* 未启用：半透明 */
+.ws-inactive {
+  opacity: 0.35;
+}
+.ws-inactive:hover { opacity: 0.6; }
+
+/* 就绪：正常 */
+.ws-ready {
+  opacity: 1;
+}
+
+/* 工作中：呼吸灯光晕 */
+.ws-busy .ink-avatar {
+  animation: sealBreathe 1.6s ease-in-out infinite;
+}
+
+@keyframes sealBreathe {
+  0%, 100% {
+    box-shadow: 0 0 4px 2px rgba(255,200,80,0.3), 0 0 0 2px rgba(255,200,80,0.4);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 28px 10px rgba(255,200,80,0.65), 0 0 0 4px rgba(255,200,80,0.85);
+    filter: brightness(1.15);
+  }
+}
+
+/* ── Workspace Agent Task Bubble ──────────────────── */
+.ws-bubble {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(30,20,10,0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 0.5px solid rgba(255,200,80,0.25);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: rgba(255,220,120,0.92);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: bubbleFadeIn 0.3s ease;
+}
+
+.ws-bubble-right {
+  left: calc(100% + 6px);
+}
+
+.ws-bubble-left {
+  right: calc(100% + 6px);
+}
+
+@keyframes bubbleFadeIn {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9); }
+  to   { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+/* ── Workspace Agent Task Popover ──────────────────── */
+.ws-task-popover {
+  position: fixed;
+  z-index: 100;
+  width: min(480px, calc(100vw - 16px));
+  max-height: 480px;
+  overflow-y: auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.04);
+  padding: 14px;
+  animation: fadeIn 0.15s ease;
+}
+
+.ws-task-popover.hidden {
+  display: none;
+}
+
+/* Close popover when clicking outside */
+.ws-popover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: transparent;
+}
+
+.ws-popover-header {
+  display: none;
+}
+
+.ws-popover-name {
+  display: none;
+}
+
+.ws-popover-detail {
+  display: none;
+}
+
+.ws-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ws-popover-body .task-card {
+  padding: 10px 12px;
+}
+
+.ws-popover-body .task-title {
+  font-size: 12px;
+}
+
+/* ── Flying Scroll Decree Animation ───────────────── */
+.scroll-decree {
+  position: absolute;
+  font-size: 20px;
+  z-index: 50;
+  pointer-events: none;
+  animation: flyScroll var(--fly-duration, 0.8s) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes flyScroll {
+  0% {
+    transform: translate(var(--start-x), var(--start-y)) scale(0.6) rotate(-15deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate(var(--end-x), var(--end-y)) scale(0.8) rotate(5deg);
+    opacity: 0;
+  }
+}
+
+/* ── Conclusion Highlight Tags ────────────────────── */
+.hl-code  { font-family: monospace; background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; }
+.hl-file  { font-family: monospace; background: rgba(0,122,255,0.08); color: #0055b3; padding: 1px 6px; border-radius: 4px; }
+.hl-ident { font-family: monospace; color: #6e3b00; background: rgba(175,120,40,0.08); padding: 0 3px; border-radius: 3px; }
+

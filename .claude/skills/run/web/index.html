@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Team</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Three-Column Layout -->
+    <div class="main-layout" id="main-sections">
+
+      <!-- Left: Agents -->
+      <aside class="panel panel-left">
+        <div class="panel-section">
+          <div class="panel-header-row">
+            <div class="panel-verse panel-verse-top">
+              <span>我来问道无馀说，</span>
+              <span>云在青天水在瓶。</span>
+            </div>
+            <button class="refresh-btn" id="refresh-agents-btn" data-action="refresh-agents" title="刷新臣工">↺</button>
+          </div>
+          <div id="agents-container">
+            <div class="empty-state">Loading agents...</div>
+          </div>
+          <div id="pending-tasks-left-container"></div>
+        </div>
+      </aside>
+
+      <!-- Center: Task Form + Active Tasks + Recent Tasks -->
+      <main class="panel panel-center">
+        <div class="panel-section">
+          <div class="center-hero-wrap">
+            <img class="center-hero-img" src="/static/wanshoudijun.png" alt="" id="hero-avatar">
+            <div class="hero-quote-bubble" id="hero-quote"></div>
+          </div>
+          <div id="task-form-container"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-header-row">
+            <div class="panel-verse panel-verse-top">
+              <span>其政闷闷，其民淳淳，</span>
+              <span>其政察察，其民缺缺。</span>
+            </div>
+            <button class="refresh-btn" id="refresh-workspace-btn" data-action="refresh-workspace" title="刷新朝堂">↺</button>
+          </div>
+          <div id="active-tasks-container">
+            <div class="empty-state">Loading tasks...</div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right: Task History -->
+      <aside class="panel panel-right">
+        <div class="panel-section">
+          <div class="panel-header-row">
+            <div class="panel-verse panel-verse-top">
+              <span>练得身形似鹤形，</span>
+              <span>千株松下两函经。</span>
+            </div>
+            <button class="refresh-btn" id="refresh-history-btn" data-action="refresh-history" title="刷新史册">↺</button>
+          </div>
+          <div id="history-tasks-container">
+            <div class="empty-state">Loading history...</div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Agent Detail Page (hidden by default) -->
+    <div id="agent-page" class="agent-page">
+      <div id="agent-page-content"></div>
+    </div>
+
+    <!-- Charter (SKILL.md) Page (hidden by default) -->
+    <div id="charter-page" class="agent-page">
+      <div id="charter-page-content"></div>
+    </div>
+
+  </div>
+
+  <!-- Utility layer -->
+  <script src="/static/api.js"></script>
+  <script src="/static/utils.js"></script>
+  <!-- Component layer -->
+  <script src="/static/agent-components.js"></script>
+  <script src="/static/task-components.js"></script>
+  <script src="/static/workspace-components.js"></script>
+  <!-- Application logic -->
+  <script src="/static/workspace-logic.js"></script>
+  <script src="/static/agent-actions.js"></script>
+  <script src="/static/task-actions.js"></script>
+  <script src="/static/app.js"></script>
+  <script>
+    (function() {
+      const quotes = [
+        '没有谁是真正的贤臣，贤时用之，不贤黜之。',
+        '椒盐送来！',
+        '冒青烟！',
+        '欺天啦！',
+        '朕的token！',
+        '三光日月星',
+        '不因水清而偏用',
+      ];
+      let lastIndex = -1;
+
+      const avatar = document.getElementById('hero-avatar');
+      const bubble = document.getElementById('hero-quote');
+
+      avatar.addEventListener('mouseenter', function() {
+        let idx;
+        do { idx = Math.floor(Math.random() * quotes.length); } while (idx === lastIndex && quotes.length > 1);
+        lastIndex = idx;
+        bubble.textContent = quotes[idx];
+        bubble.classList.add('visible');
+      });
+
+      avatar.addEventListener('mouseleave', function() {
+        bubble.classList.remove('visible');
+      });
+    })();
+  </script>
+</body>
+</html>

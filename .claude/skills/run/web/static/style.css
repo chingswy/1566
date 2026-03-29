@@ -1,0 +1,17 @@
+/* style.css — Main entry: imports all partials.
+ *
+ * Sub-files (all under static/css/):
+ *   base.css          — Reset, body, scrollbar, glass card, layout
+ *   agents.css        — Agent cards, avatar, detail page, memory, records
+ *   tasks.css         — Task form, cards, detail, timeline, buttons, modal
+ *   utils-md.css      — Utility classes, markdown body, hero image, badges
+ *   workspace.css     — 朝堂式布局, workspace nodes, animation, mobile
+ *   charter-cadoc.css — Charter button/page, 案牍列表, standalone page
+ */
+
+@import url('css/base.css');
+@import url('css/agents.css');
+@import url('css/tasks.css');
+@import url('css/utils-md.css');
+@import url('css/workspace.css');
+@import url('css/charter-cadoc.css');

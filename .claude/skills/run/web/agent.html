@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="agent-standalone-page">
+  <div id="agent-standalone-root">
+    <div class="empty-state" style="padding:40px">Loading...</div>
+  </div>
+
+  <!-- Utility & component layer (no app.js needed for standalone page) -->
+  <script src="/static/api.js"></script>
+  <script src="/static/utils.js"></script>
+  <script src="/static/agent-components.js"></script>
+  <script src="/static/task-components.js"></script>
+  <script src="/static/workspace-components.js"></script>
+  <script>
+    (async function() {
+      // Extract agent name from URL path: /agent/<name>
+      const name = location.pathname.split('/agent/')[1]?.split('/')[0];
+      if (!name) {
+        document.getElementById('agent-standalone-root').innerHTML =
+          '<div class="empty-state" style="padding:40px">Agent not found</div>';
+        return;
+      }
+
+      // Load agent labels first (needed by renderAvatar/getDisplayName)
+      await loadAgentLabels();
+
+      // Fetch data
+      let agentData, memoryData, recordsData;
+      try {
+        const [agentRes, memRes, recRes] = await Promise.all([
+          fetch(`/api/agents/${name}`).then(r => r.json()),
+          fetch(`/api/agents/${name}/memory`).then(r => r.json()),
+          fetch(`/api/agents/${name}/records`).then(r => r.json()),
+        ]);
+        agentData  = agentRes.code === 0  ? agentRes.data  : null;
+        memoryData = memRes.code  === 0  ? memRes.data   : {};
+        recordsData= recRes.code  === 0  ? recRes.data   : [];
+      } catch (e) {
+        document.getElementById('agent-standalone-root').innerHTML =
+          `<div class="empty-state" style="padding:40px">Failed to load: ${e.message}</div>`;
+        return;
+      }
+
+      if (!agentData) {
+        document.getElementById('agent-standalone-root').innerHTML =
+          '<div class="empty-state" style="padding:40px">Agent not found</div>';
+        return;
+      }
+
+      // Update page title
+      document.title = getDisplayName(name) || name;
+
+      // Render page
+      const root = document.getElementById('agent-standalone-root');
+      root.className = 'agent-page agent-standalone-inner';
+      root.innerHTML = renderAgentPage(agentData, memoryData, recordsData);
+
+      // Handle back button: use history.back() if available, else go to /
+      root.addEventListener('click', async function(e) {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+
+        // Helper: spin refresh button
+        function spinBtn(el, on) {
+          if (!el) return;
+          if (on) el.classList.add('spinning');
+          else el.classList.remove('spinning');
+        }
+
+        if (action === 'close-agent-page') {
+          if (window.history.length > 1) {
+            history.back();
+          } else {
+            location.href = '/';
+          }
+          return;
+        }
+
+        // Agent edit actions
+        if (action === 'toggle-agent-edit') {
+          const agentName = btn.dataset.agent;
+          const viewEl = document.getElementById(`agent-view-${agentName}`);
+          const editEl = document.getElementById(`agent-edit-${agentName}`);
+          const editBtn = document.querySelector(`[data-action="toggle-agent-edit"][data-agent="${agentName}"]`);
+          if (viewEl && editEl) {
+            viewEl.classList.add('hidden');
+            editEl.classList.remove('hidden');
+            if (editBtn) editBtn.classList.add('hidden');
+            const editor = document.getElementById(`agent-editor-${agentName}`);
+            if (editor) editor.focus();
+          }
+          return;
+        }
+
+        if (action === 'cancel-agent-edit') {
+          const agentName = btn.dataset.agent;
+          const viewEl = document.getElementById(`agent-view-${agentName}`);
+          const editEl = document.getElementById(`agent-edit-${agentName}`);
+          const editBtn = document.querySelector(`[data-action="toggle-agent-edit"][data-agent="${agentName}"]`);
+          if (viewEl && editEl) {
+            const editor = document.getElementById(`agent-editor-${agentName}`);
+            if (editor && agentData) editor.value = agentData.full_content || '';
+            editEl.classList.add('hidden');
+            viewEl.classList.remove('hidden');
+            if (editBtn) editBtn.classList.remove('hidden');
+          }
+          return;
+        }
+
+        if (action === 'save-agent') {
+          const agentName = btn.dataset.agent;
+          const editor = document.getElementById(`agent-editor-${agentName}`);
+          if (!editor) return;
+          const res = await fetch(`/api/agents/${agentName}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: editor.value }),
+          }).then(r => r.json());
+          if (res.code === 0) {
+            agentData.full_content = editor.value;
+            const viewEl = document.getElementById(`agent-view-${agentName}`);
+            if (viewEl) viewEl.innerHTML = renderAgentDefinition(editor.value);
+            // cancel edit mode
+            const editEl = document.getElementById(`agent-edit-${agentName}`);
+            const editBtn = document.querySelector(`[data-action="toggle-agent-edit"][data-agent="${agentName}"]`);
+            if (editEl) editEl.classList.add('hidden');
+            if (viewEl) viewEl.classList.remove('hidden');
+            if (editBtn) editBtn.classList.remove('hidden');
+          } else {
+            alert(`Save failed: ${res.message}`);
+          }
+          return;
+        }
+
+        if (action === 'retire-agent') {
+          if (confirm(`Retire agent "${btn.dataset.agent}"? Memory will be merged into chief_assistant.`)) {
+            const res = await fetch(`/api/agents/${btn.dataset.agent}/retire`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ merge_into: 'chief_assistant' }),
+            }).then(r => r.json());
+            if (res.code === 0) {
+              location.href = '/';
+            } else {
+              alert(`Retire failed: ${res.message}`);
+            }
+          }
+          return;
+        }
+
+        if (action === 'toggle-alias-edit') {
+          const group = document.getElementById(`alias-edit-group-${btn.dataset.agent}`);
+          if (group) group.classList.toggle('hidden');
+          return;
+        }
+
+        if (action === 'cancel-alias-edit') {
+          const group = document.getElementById(`alias-edit-group-${btn.dataset.agent}`);
+          if (group) group.classList.add('hidden');
+          return;
+        }
+
+        if (action === 'save-alias') {
+          const agentName = btn.dataset.agent;
+          const input = document.getElementById(`alias-input-${agentName}`);
+          if (input) {
+            await fetch('/api/agent-labels', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: agentName, label: input.value }),
+            });
+            await loadAgentLabels();
+            const group = document.getElementById(`alias-edit-group-${agentName}`);
+            if (group) group.classList.add('hidden');
+            const display = document.getElementById(`alias-display-${agentName}`);
+            if (display) display.textContent = getDisplayName(agentName);
+          }
+          return;
+        }
+
+        if (action === 'delete-memory-item') {
+          const agentName = btn.dataset.agent;
+          const item = btn.dataset.item;
+          const res = await fetch(`/api/agents/${agentName}/memory/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedbacks: [{ item, vote: 'down' }], comment: '' }),
+          }).then(r => r.json());
+          if (res.code === 0) {
+            const memRes = await fetch(`/api/agents/${agentName}/memory`).then(r => r.json());
+            if (memRes.code === 0) {
+              memoryData = memRes.data;
+              const memBody = document.querySelector('.agent-memory-body');
+              if (memBody) memBody.innerHTML = renderMemoryItems(memRes.data.items || [], agentName);
+            }
+          }
+          return;
+        }
+
+        if (action === 'refresh-memory') {
+          spinBtn(btn, true);
+          try {
+            const agentName = btn.dataset.agent;
+            const memRes = await fetch(`/api/agents/${agentName}/memory`).then(r => r.json());
+            if (memRes.code === 0) {
+              memoryData = memRes.data;
+              const memBody = document.querySelector('.agent-memory-body');
+              if (memBody) memBody.innerHTML = renderMemoryItems(memRes.data.items || [], agentName);
+            }
+          } finally { spinBtn(btn, false); }
+          return;
+        }
+
+        if (action === 'refresh-records') {
+          spinBtn(btn, true);
+          try {
+            const agentName = btn.dataset.agent;
+            const recRes = await fetch(`/api/agents/${agentName}/records`).then(r => r.json());
+            if (recRes.code === 0) {
+              recordsData = recRes.data;
+              const recBody = document.querySelector('.agent-records-body');
+              if (recBody) recBody.innerHTML = renderRecordList(recRes.data);
+            }
+          } finally { spinBtn(btn, false); }
+          return;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+/* ── Charter (内阁章程) Button ───────────────────── */
+.charter-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(139,37,0,0.2);
+  background: rgba(139,37,0,0.03);
+  transition: all 0.2s ease;
+}
+
+.charter-btn:hover {
+  background: rgba(139,37,0,0.07);
+  border-color: rgba(139,37,0,0.35);
+}
+
+.charter-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #8b2500;
+  color: #f5e6d0;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-weight: 700;
+  font-size: 18px;
+  border-radius: 4px;
+  box-shadow: 1px 1px 3px rgba(139,37,0,0.25);
+  text-shadow: 0 0 1px rgba(245,230,208,0.6);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.charter-btn-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b2500;
+  letter-spacing: 0.08em;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+}
+
+/* ── Charter Page Icon ───────────────────────────── */
+.charter-page-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #8b2500;
+  color: #f5e6d0;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-weight: 700;
+  font-size: 24px;
+  border-radius: 4px;
+  box-shadow: 1px 1px 3px rgba(139,37,0,0.25);
+  text-shadow: 0 0 1px rgba(245,230,208,0.6);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.charter-page-body-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.charter-editor-textarea {
+  min-height: 500px;
+}
+
+/* ── 案牍列表（左栏待处理任务）────────────────────────── */
+.cadoc-section {
+  margin-top: 1.2vh;
+  border-top: 1px solid rgba(139,115,85,0.15);
+  padding-top: 0.8vh;
+}
+
+.cadoc-header {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(74,55,40,0.55);
+  padding: 0 0.6vw 0.4vh;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.cadoc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cadoc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  padding: 0.4vh 0.6vw;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cadoc-item:hover {
+  background: rgba(139,115,85,0.08);
+}
+
+.cadoc-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(178,34,34,0.65);
+  flex-shrink: 0;
+}
+
+.cadoc-title {
+  font-size: 12px;
+  color: rgba(74,55,40,0.80);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.cadoc-edit {
+  padding: 0.4vh 0.4vw 0.6vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vh;
+  background: rgba(139,115,85,0.06);
+  border-radius: 6px;
+}
+
+.cadoc-edit.hidden {
+  display: none;
+}
+
+.cadoc-textarea {
+  width: 100%;
+  min-height: 60px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.70);
+  border: 1px solid rgba(139,115,85,0.20);
+  border-radius: 6px;
+  color: rgba(74,55,40,0.88);
+  padding: 0.4vh 0.5vw;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.cadoc-textarea:focus {
+  outline: none;
+  border-color: rgba(139,115,85,0.40);
+  background: rgba(255,255,255,0.88);
+}
+
+.cadoc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4vw;
+}
+
+.cadoc-empty {
+  font-size: 11px;
+  color: rgba(74,55,40,0.35);
+  padding: 0.4vh 0.6vw;
+  font-style: italic;
+}
+
+/* ── Agent Standalone Page ──────────────────────────── */
+.agent-standalone-page {
+  min-height: 100vh;
+  background: #f5f5f7;
+}
+
+.agent-standalone-inner {
+  position: static !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  height: auto !important;
+  overflow-y: visible !important;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
