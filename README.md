@@ -42,6 +42,21 @@
 > 从 Github远程仓库安装 skill：仓库地址：https://github.com/chingswy/1566 ，skill目录：`.claude/skills/run`；安装后打开网页服务，运行脚本 `bash .claude/skills/run/start.sh`
 ```
 
+> **⚠️ 注意（无 gh 命令的环境）**：如果环境中没有安装 `gh` CLI，Claude Code 会自动降级使用 `git clone`。实际安装逻辑等价于：
+>
+> ```bash
+> # 1. 克隆仓库到临时目录
+> git clone https://github.com/chingswy/1566.git /tmp/1566
+>
+> # 2. 确认目标 skills 目录存在（通常是项目的 .claude/skills/）
+> ls <YOUR_PROJECT>/.claude/skills/
+>
+> # 3. 拷贝 run skill
+> cp -r /tmp/1566/.claude/skills/run <YOUR_PROJECT>/.claude/skills/
+> ```
+>
+> Claude Code 重新加载后即可识别到新增的 `run` skill。
+
 **极简主义使用**：在打开的网页中直接下诏，在Claude Code中输入：
 
 ```
