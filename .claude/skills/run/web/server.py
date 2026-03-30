@@ -64,6 +64,10 @@ def create_app():
     def agent_page(name):
         return send_from_directory(str(SCRIPT_DIR), "agent.html")
 
+    @app.route("/history")
+    def history_page():
+        return send_from_directory(str(SCRIPT_DIR), "history.html")
+
     return app
 
 

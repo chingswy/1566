@@ -83,6 +83,18 @@ body {
   pointer-events: none;
 }
 
+/* Clickable verse link (e.g. right panel → /history) */
+a.panel-verse-link {
+  pointer-events: auto;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+a.panel-verse-link:hover {
+  opacity: 0.85;
+}
+
 .panel-verse-top {
   padding-top: 2px;
   padding-bottom: 14px;

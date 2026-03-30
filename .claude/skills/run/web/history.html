@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>史册 — Agent Team</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* ── History Page Layout ─────────────────────────── */
+    body {
+      overflow: auto;
+      background: #faf7f0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(139,115,85,0.03) 0px,
+          rgba(139,115,85,0.03) 1px,
+          transparent 1px,
+          transparent 28px
+        );
+      min-height: 100vh;
+    }
+
+    .history-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Top bar ─────────────────────────────────────── */
+    .history-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0 16px;
+      border-bottom: 0.5px solid rgba(139,115,85,0.15);
+      margin-bottom: 28px;
+      position: sticky;
+      top: 0;
+      background: rgba(250,247,240,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .history-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #b22222;
+      font-size: 22.4px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 4px 10px 4px 0;
+      border-radius: 8px;
+      transition: opacity 0.15s ease, background 0.15s ease;
+      line-height: 1;
+    }
+
+    .history-back-btn:hover {
+      opacity: 0.75;
+      background: rgba(178,34,34,0.06);
+    }
+
+    .history-back-arrow {
+      font-size: 24px;
+      font-weight: 300;
+      color: #b22222;
+    }
+
+    .history-back-label {
+      font-size: 17.6px;
+      color: #4a3728;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .history-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .history-title {
+      font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+      font-size: 32px;
+      color: #4a3728;
+      letter-spacing: 0.15em;
+      line-height: 1;
+    }
+
+    .history-count-badge {
+      font-size: 13.6px;
+      color: rgba(74,55,40,0.55);
+      background: rgba(178,34,34,0.07);
+      border: 0.5px solid rgba(178,34,34,0.18);
+      border-radius: 20px;
+      padding: 2px 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .history-refresh-btn {
+      font-size: 20px;
+      color: #4a3728;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      opacity: 0.55;
+      transition: opacity 0.15s ease, background 0.15s ease;
+      line-height: 1;
+    }
+
+    .history-refresh-btn:hover {
+      opacity: 0.9;
+      background: rgba(74,55,40,0.07);
+    }
+
+    /* ── Task list ───────────────────────────────────── */
+    #history-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #history-list-container .glass-card.task-card {
+      width: 100%;
+      /* Override default task-card narrow styles */
+      margin: 0;
+    }
+
+    /* Full-width task detail expansion */
+    #history-list-container .task-detail {
+      max-height: none;
+    }
+
+    /* ── Status tabs ─────────────────────────────────── */
+    .history-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .history-tab {
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 14.4px;
+      color: #4a3728;
+      background: rgba(255,255,255,0.55);
+      border: 0.5px solid rgba(139,115,85,0.2);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      user-select: none;
+      letter-spacing: 0.04em;
+    }
+
+    .history-tab.active {
+      background: rgba(178,34,34,0.1);
+      border-color: rgba(178,34,34,0.35);
+      color: #b22222;
+      font-weight: 600;
+    }
+
+    .history-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.75);
+    }
+
+    /* ── Empty & loading states ─────────────────────── */
+    .history-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(74,55,40,0.40);
+      font-size: 16px;
+      letter-spacing: 0.1em;
+    }
+
+    .history-empty::before {
+      content: '📜';
+      display: block;
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Footer poem ─────────────────────────────────── */
+    .history-footer-poem {
+      margin-top: 64px;
+      padding: 32px 0 24px;
+      border-top: 0.5px solid rgba(139,115,85,0.12);
+      text-align: center;
+    }
+
+    .history-footer-poem p {
+      font-size: 15.2px;
+      color: #4a3728;
+      opacity: 0.55;
+      letter-spacing: 0.2em;
+      line-height: 2.2;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="history-page">
+
+    <!-- Top bar -->
+    <div class="history-topbar">
+      <a href="/" class="history-back-btn" title="返回主页">
+        <span class="history-back-arrow">‹</span>
+        <span class="history-back-label">返回</span>
+      </a>
+
+      <div class="history-title-wrap">
+        <span class="history-title">史册</span>
+        <span class="history-count-badge" id="history-count">…</span>
+      </div>
+
+      <button class="history-refresh-btn" id="history-refresh-btn" title="刷新">↺</button>
+    </div>
+
+    <!-- Status tabs -->
+    <div class="history-tabs">
+      <button class="history-tab active" data-status="all">全部</button>
+      <button class="history-tab" data-status="completed">已完成</button>
+      <button class="history-tab" data-status="failed">已失败</button>
+    </div>
+
+    <!-- Task list -->
+    <div id="history-list-container">
+      <div class="history-empty">正在翻阅史册…</div>
+    </div>
+
+    <!-- Footer poem -->
+    <div class="history-footer-poem">
+      <p>练得身形似鹤形，千株松下两函经。</p>
+      <p>我来问道无馀说，云在青天水在瓶。</p>
+    </div>
+
+  </div>
+
+  <!-- Utility layer -->
+  <script src="/static/api.js"></script>
+  <script src="/static/utils.js"></script>
+  <!-- Component layer -->
+  <script src="/static/agent-components.js"></script>
+  <script src="/static/task-components.js"></script>
+  <script src="/static/workspace-components.js"></script>
+
+  <script>
+    (function () {
+      // ── State ────────────────────────────────────────
+      let allTasks = [];
+      let currentStatus = 'all'; // 'all' | 'completed' | 'failed'
+
+      // ── Helpers ──────────────────────────────────────
+      function filteredTasks() {
+        if (currentStatus === 'all') return allTasks;
+        return allTasks.filter(t => t.status === currentStatus);
+      }
+
+      function updateCountBadge() {
+        const count = filteredTasks().length;
+        document.getElementById('history-count').textContent = count + ' 件';
+      }
+
+      // ── Render ───────────────────────────────────────
+      function renderList() {
+        const container = document.getElementById('history-list-container');
+        const tasks = filteredTasks();
+        if (tasks.length === 0) {
+          container.innerHTML = '<div class="history-empty">此处空空如也，尚无史册可阅。</div>';
+          updateCountBadge();
+          return;
+        }
+        container.innerHTML = '';
+        tasks.forEach(task => {
+          const cardHtml = renderTaskCard(task, true, 'hist-', true, null);
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = cardHtml.trim();
+          const card = wrapper.firstChild;
+          container.appendChild(card);
+        });
+        updateCountBadge();
+      }
+
+      // ── Data loading ─────────────────────────────────
+      async function loadHistory() {
+        const container = document.getElementById('history-list-container');
+        container.innerHTML = '<div class="history-empty">正在翻阅史册…</div>';
+
+        try {
+          // Load completed and failed tasks in parallel
+          const [completedRes, failedRes] = await Promise.all([
+            API.listTasks({ status: 'completed' }),
+            API.listTasks({ status: 'failed' }),
+          ]);
+
+          const completed = (completedRes.data || []);
+          const failed = (failedRes.data || []);
+
+          // Merge and sort descending by updated_at
+          allTasks = [...completed, ...failed].sort((a, b) => {
+            const da = new Date(a.updated_at || a.created_at);
+            const db = new Date(b.updated_at || b.created_at);
+            return db - da;
+          });
+
+          renderList();
+        } catch (e) {
+          console.error('Failed to load history:', e);
+          container.innerHTML = '<div class="history-empty">加载失败，请重试。</div>';
+        }
+      }
+
+      // ── Tab switching ────────────────────────────────
+      document.querySelectorAll('.history-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          currentStatus = this.dataset.status;
+          renderList();
+        });
+      });
+
+      // ── Refresh button ───────────────────────────────
+      document.getElementById('history-refresh-btn').addEventListener('click', loadHistory);
+
+      // ── Init ─────────────────────────────────────────
+      // Load agent labels first (needed for getDisplayName inside renderTaskTimeline)
+      if (typeof loadAgentLabels === 'function') {
+        loadAgentLabels().then(() => loadHistory());
+      } else {
+        loadHistory();
+      }
+    })();
+  </script>
+</body>
+</html>

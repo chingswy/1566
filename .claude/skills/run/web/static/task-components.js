@@ -22,10 +22,14 @@ function renderTaskCard(task, defaultExpanded, idPrefix, readonly, filterAgent) 
   const title = getTaskTitle(task);
 
   if (readonly) {
+    const verdictHtml = task.verdict
+      ? `<div class="task-verdict"><span class="verdict-icon">⚖</span>${highlightConclusion(escapeHtml(task.verdict))}</div>`
+      : '';
     const detailContent =
       `<div class="task-detail open" id="${prefix}task-detail-${task.id}">` +
       renderTaskTimeline(task, filterAgent) +
       renderRawInputBlock(task) +
+      verdictHtml +
       `</div>`;
     return `
     <div class="glass-card task-card open">
