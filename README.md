@@ -83,6 +83,34 @@
 </p>
 
 
+## 更新说明
+
+升级 skill 时，请**只覆盖代码文件，切勿覆盖以下数据目录**，否则将丢失所有 Agent 记忆与任务历史：
+
+| 路径 | 说明 | 是否覆盖 |
+|------|------|----------|
+| `.claude/skills/run/memory/` | Agent 持久记忆 & 执行记录 | ❌ 禁止覆盖 |
+| `.claude/skills/run/web/tasks.db` | 任务队列 SQLite 数据库 | ❌ 禁止覆盖 |
+| `.claude/skills/run/agents/*.md` | 团队角色定义（含自定义修改） | ⚠️ 按需保留 |
+| `.claude/skills/run/team_roster.md` | 团队索引（自动生成） | ✅ 可覆盖 |
+
+**推荐更新方式**（在 Claude Code 中输入）：
+
+```bash
+# 1. 备份数据
+cp -r .claude/skills/run/memory .claude/skills/run/memory.bak
+cp .claude/skills/run/web/tasks.db .claude/skills/run/web/tasks.db.bak
+
+# 2. 仅拉取代码文件，跳过数据目录
+git -C /tmp/1566 pull || git clone https://github.com/chingswy/1566.git /tmp/1566
+rsync -av --exclude='memory/' --exclude='web/tasks.db' \
+  /tmp/1566/.claude/skills/run/ .claude/skills/run/
+```
+
+> ⚠️ 若使用 `cp -r` 直接整体覆盖，**memory 目录和 tasks.db 将被清空**，Agent 的所有历史认知与任务队列将永久丢失。
+
+---
+
 ## 初始团队
 
 | 角色 | 做什么 |
