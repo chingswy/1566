@@ -211,9 +211,10 @@
 
       <!-- Content section -->
       <div class="create-form-section">
-        <div class="section-label">完整内容（可编辑）</div>
+        <div class="section-label">Markdown 正文</div>
+        <div class="form-hint" style="margin-bottom:10px">YAML header 由上方字段自动生成，此处只编辑正文部分</div>
         <div class="form-group">
-          <textarea class="input-field agent-create-content" id="new-agent-content" rows="16" placeholder="Agent 文件内容预览..."></textarea>
+          <textarea class="input-field agent-create-content" id="new-agent-content" rows="14" placeholder="正文内容（标题、职责说明等）..."></textarea>
         </div>
       </div>
 
@@ -230,40 +231,70 @@
   <script src="/static/agent-components.js"></script>
   <script src="/static/agent-actions.js"></script>
   <script>
+    // 根据外部字段生成 YAML frontmatter 字符串
+    function buildFrontmatter(name, description, expertise, tags) {
+      return `---
+name: ${name || ''}
+description: "${description || ''}"
+role: worker
+status: active
+expertise: "${expertise || ''}"
+tags: "${tags || ''}"
+---`;
+    }
+
+    // 生成默认 body（不含 frontmatter）
+    function buildDefaultBody(name, description, expertise) {
+      const titleName = name
+        ? name.split(/[-_]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        : 'New Agent';
+      return `# ${titleName}
+
+## 职责
+${description || '描述该 agent 的职责。'}
+
+## 专长领域
+${expertise || '列出专长领域，逗号分隔。'}
+
+## 工作原则
+- 执行前必读自己的记忆（memory.md + 最近 records）
+- 执行后必写记忆（add-record + 按需 update-memory）
+- 可按需读取 attachments/ 下的共享知识文件
+- 严格完成分配的子任务，不超出职责范围
+`;
+    }
+
     (async function() {
-      // Load agent labels
       await loadAgentLabels();
 
-      // Initialize content textarea with blank template
       const contentEl = document.getElementById('new-agent-content');
-      if (contentEl) {
-        contentEl.value = generateAgentContent('', '', '', '');
-      }
 
-      // Track whether user has manually edited the content textarea
-      let _contentUserEdited = false;
-      if (contentEl) {
-        contentEl.addEventListener('input', () => { _contentUserEdited = true; });
-      }
-
-      // Auto-update content when fields change
-      function _onFieldInput() {
-        if (_contentUserEdited) return;
+      // 初始化 body（模板来源选空时）
+      function _resetBody() {
         const name = document.getElementById('new-agent-name')?.value.trim() || '';
         const desc = document.getElementById('new-agent-desc')?.value.trim() || '';
         const expertise = document.getElementById('new-agent-expertise')?.value.trim() || '';
-        const tags = document.getElementById('new-agent-tags')?.value.trim() || '';
-        if (contentEl) {
-          contentEl.value = generateAgentContent(name, desc, expertise, tags);
-        }
+        if (contentEl) contentEl.value = buildDefaultBody(name, desc, expertise);
+      }
+      _resetBody();
+
+      // 当 name/desc/expertise 改变时，若 body 未手动编辑则同步更新 body 默认内容
+      let _bodyUserEdited = false;
+      if (contentEl) {
+        contentEl.addEventListener('input', () => { _bodyUserEdited = true; });
       }
 
-      ['new-agent-name', 'new-agent-desc', 'new-agent-expertise', 'new-agent-tags'].forEach(id => {
+      function _onFieldInput() {
+        if (_bodyUserEdited) return;
+        _resetBody();
+      }
+
+      ['new-agent-name', 'new-agent-desc', 'new-agent-expertise'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', _onFieldInput);
       });
 
-      // Load template agents into select
+      // 加载模板 Agent 列表
       async function _loadTemplateAgents() {
         const select = document.getElementById('new-agent-template');
         if (!select) return;
@@ -277,72 +308,57 @@
               select.appendChild(opt);
             });
           }
-        } catch (e) {
-          // silently ignore
-        }
+        } catch (e) { /* ignore */ }
         select.addEventListener('change', _onTemplateChange);
       }
 
-      // Handle template selection change
+      // 模板选中：填充外部字段 + 将模板的 body 填入 textarea
       async function _onTemplateChange(e) {
         const agentName = e.target.value;
         if (!agentName) {
-          _contentUserEdited = false;
-          _onFieldInput();
+          _bodyUserEdited = false;
+          _resetBody();
           ['new-agent-desc', 'new-agent-expertise', 'new-agent-tags'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
           });
           return;
         }
-
         try {
           const res = await API.getAgent(agentName);
           if (res.code === 0 && res.data) {
-            const agent = res.data;
-            const fullContent = agent.full_content || '';
-
-            const { meta } = parseAgentContent(fullContent);
+            const { meta, body } = parseAgentContent(res.data.full_content || '');
             if (meta) {
-              const descEl = document.getElementById('new-agent-desc');
-              const expertiseEl = document.getElementById('new-agent-expertise');
-              const tagsEl = document.getElementById('new-agent-tags');
-              if (descEl && meta.description) descEl.value = meta.description;
-              if (expertiseEl && meta.expertise) expertiseEl.value = meta.expertise;
-              if (tagsEl && meta.tags) tagsEl.value = meta.tags;
+              if (meta.description) document.getElementById('new-agent-desc').value = meta.description;
+              if (meta.expertise)   document.getElementById('new-agent-expertise').value = meta.expertise;
+              if (meta.tags)        document.getElementById('new-agent-tags').value = meta.tags;
             }
-
-            // Clear name in copied content
-            const newContent = fullContent.replace(/^(---[\s\S]*?name:\s*)([^\n]+)/m, '$1');
-            if (contentEl) contentEl.value = newContent;
-            _contentUserEdited = true;
+            // body 部分填入 textarea
+            if (contentEl) contentEl.value = body || '';
+            _bodyUserEdited = true;
           }
-        } catch (err) {
-          // ignore
-        }
+        } catch (err) { /* ignore */ }
       }
 
       await _loadTemplateAgents();
 
-      // Back button
+      // 返回按钮
       document.getElementById('back-btn').addEventListener('click', () => {
-        if (window.history.length > 1) {
-          history.back();
-        } else {
-          location.href = '/';
-        }
+        window.history.length > 1 ? history.back() : (location.href = '/');
       });
 
-      // Cancel button
+      // 取消按钮
       document.getElementById('cancel-btn').addEventListener('click', () => {
         location.href = '/';
       });
 
-      // Create button
+      // 创建按钮：用外部字段拼接 frontmatter + body → 发送
       document.getElementById('create-btn').addEventListener('click', async () => {
-        const name = document.getElementById('new-agent-name')?.value.trim();
-        const description = document.getElementById('new-agent-desc')?.value.trim();
-        const fullContent = contentEl?.value.trim();
+        const name        = document.getElementById('new-agent-name')?.value.trim();
+        const description = document.getElementById('new-agent-desc')?.value.trim() || '';
+        const expertise   = document.getElementById('new-agent-expertise')?.value.trim() || '';
+        const tags        = document.getElementById('new-agent-tags')?.value.trim() || '';
+        const body        = contentEl?.value || '';
 
         if (!name) {
           alert('Name 是必填项');
@@ -352,20 +368,13 @@
           alert('Name 必须以小写字母开头，只能包含小写字母、数字、连字符和下划线');
           return;
         }
-        if (!description && !fullContent) {
-          alert('请填写 Description 或完整内容');
+        if (!description) {
+          alert('请填写 Description');
           return;
         }
 
-        let finalContent = fullContent;
-        if (!finalContent) {
-          const expertise = document.getElementById('new-agent-expertise')?.value.trim() || '';
-          const tags = document.getElementById('new-agent-tags')?.value.trim() || '';
-          finalContent = generateAgentContent(name, description, expertise, tags);
-        }
-
-        // Replace name field in frontmatter
-        finalContent = finalContent.replace(/^(---[\s\S]*?name:\s*)([^\n]*)/m, `$1${name}`);
+        // 用外部字段组装最终文件内容
+        const finalContent = buildFrontmatter(name, description, expertise, tags) + '\n' + body;
 
         const createBtn = document.getElementById('create-btn');
         createBtn.disabled = true;
