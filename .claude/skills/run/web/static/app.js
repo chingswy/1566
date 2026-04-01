@@ -252,7 +252,7 @@ async function handleClick(e) {
       break;
 
     case 'show-create-agent':
-      showCreateAgentModal();
+      window.location.href = '/create-agent';
       break;
 
     case 'create-agent':

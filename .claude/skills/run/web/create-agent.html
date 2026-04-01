@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新建 Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body {
+      min-height: 100vh;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #f5f0e8 0%, #ede8dc 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 40px 0;
+    }
+
+    .create-agent-nav {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      align-items: center;
+      padding: 20px 24px 8px;
+      gap: 16px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14.4px;
+      color: #86868b;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 0;
+      transition: color 0.18s;
+      font-family: inherit;
+    }
+    .back-btn:hover { color: #1d1d1f; }
+
+    .create-agent-container {
+      width: 100%;
+      max-width: 760px;
+      padding: 0 24px;
+    }
+
+    .create-agent-header {
+      margin-bottom: 28px;
+    }
+
+    .create-agent-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 28.8px;
+      font-weight: 700;
+      color: #1d1d1f;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .create-agent-subtitle {
+      font-size: 14.4px;
+      color: #86868b;
+    }
+
+    .create-agent-form {
+      background: rgba(255,255,255,0.76);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.85);
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      padding: 32px 36px 28px;
+    }
+
+    .create-form-section {
+      margin-bottom: 20px;
+    }
+
+    .create-form-section:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .create-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-actions-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      margin-top: 24px;
+    }
+
+    .btn-create {
+      padding: 10px 28px;
+      background: #1d1d1f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14.4px;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.18s, transform 0.1s;
+    }
+    .btn-create:hover { background: #3a3a3c; }
+    .btn-create:active { transform: scale(0.98); }
+
+    .btn-cancel-page {
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.06);
+      color: #3a3a3c;
+      border: none;
+      border-radius: 10px;
+      font-size: 14.4px;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.18s;
+    }
+    .btn-cancel-page:hover { background: rgba(0,0,0,0.10); }
+
+    .agent-create-content {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 12.8px;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      margin: 24px 0 20px;
+    }
+
+    .section-label {
+      font-size: 11.2px;
+      font-weight: 600;
+      color: #86868b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="create-agent-nav">
+    <button class="back-btn" id="back-btn">‹ 返回</button>
+  </div>
+
+  <div class="create-agent-container">
+    <div class="create-agent-header">
+      <div class="create-agent-title">新建 Agent</div>
+      <div class="create-agent-subtitle">创建一位新的团队成员，定义其职责与专长</div>
+    </div>
+
+    <div class="create-agent-form">
+      <!-- Copy from section -->
+      <div class="create-form-section">
+        <div class="section-label">模板来源</div>
+        <div class="form-group">
+          <label class="form-label">复制自（继承内容）</label>
+          <select class="input-field" id="new-agent-template">
+            <option value="">— 空白模板 —</option>
+          </select>
+          <div class="form-hint" style="margin-top:6px">选择后将继承该 agent 的描述、专长、标签和内容</div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Basic info section -->
+      <div class="create-form-section">
+        <div class="section-label">基本信息</div>
+        <div class="create-form-row">
+          <div class="form-group">
+            <label class="form-label">Name <span class="form-hint">（仅小写字母/数字/连字符）</span></label>
+            <input class="input-field" id="new-agent-name" placeholder="lowercase-with-dashes">
+          </div>
+          <div class="form-group">
+            <label class="form-label">别名 <span class="form-hint">（可选，仅在网页显示）</span></label>
+            <input class="input-field" id="new-agent-alias" placeholder="如：张居正、海瑞...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input class="input-field" id="new-agent-desc" placeholder="What does this agent do?">
+        </div>
+        <div class="create-form-row">
+          <div class="form-group">
+            <label class="form-label">Expertise</label>
+            <input class="input-field" id="new-agent-expertise" placeholder="comma-separated areas">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags</label>
+            <input class="input-field" id="new-agent-tags" placeholder="comma-separated tags">
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Content section -->
+      <div class="create-form-section">
+        <div class="section-label">完整内容（可编辑）</div>
+        <div class="form-group">
+          <textarea class="input-field agent-create-content" id="new-agent-content" rows="16" placeholder="Agent 文件内容预览..."></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions-row">
+        <button class="btn-cancel-page" id="cancel-btn">取消</button>
+        <button class="btn-create" id="create-btn">创建 Agent</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/api.js"></script>
+  <script src="/static/utils.js"></script>
+  <script src="/static/agent-components.js"></script>
+  <script src="/static/agent-actions.js"></script>
+  <script>
+    (async function() {
+      // Load agent labels
+      await loadAgentLabels();
+
+      // Initialize content textarea with blank template
+      const contentEl = document.getElementById('new-agent-content');
+      if (contentEl) {
+        contentEl.value = generateAgentContent('', '', '', '');
+      }
+
+      // Track whether user has manually edited the content textarea
+      let _contentUserEdited = false;
+      if (contentEl) {
+        contentEl.addEventListener('input', () => { _contentUserEdited = true; });
+      }
+
+      // Auto-update content when fields change
+      function _onFieldInput() {
+        if (_contentUserEdited) return;
+        const name = document.getElementById('new-agent-name')?.value.trim() || '';
+        const desc = document.getElementById('new-agent-desc')?.value.trim() || '';
+        const expertise = document.getElementById('new-agent-expertise')?.value.trim() || '';
+        const tags = document.getElementById('new-agent-tags')?.value.trim() || '';
+        if (contentEl) {
+          contentEl.value = generateAgentContent(name, desc, expertise, tags);
+        }
+      }
+
+      ['new-agent-name', 'new-agent-desc', 'new-agent-expertise', 'new-agent-tags'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', _onFieldInput);
+      });
+
+      // Load template agents into select
+      async function _loadTemplateAgents() {
+        const select = document.getElementById('new-agent-template');
+        if (!select) return;
+        try {
+          const res = await API.listAgents();
+          if (res.code === 0 && res.data && res.data.length > 0) {
+            res.data.forEach(agent => {
+              const opt = document.createElement('option');
+              opt.value = agent.name;
+              opt.textContent = agent.name + (agent.description ? ` — ${agent.description}` : '');
+              select.appendChild(opt);
+            });
+          }
+        } catch (e) {
+          // silently ignore
+        }
+        select.addEventListener('change', _onTemplateChange);
+      }
+
+      // Handle template selection change
+      async function _onTemplateChange(e) {
+        const agentName = e.target.value;
+        if (!agentName) {
+          _contentUserEdited = false;
+          _onFieldInput();
+          ['new-agent-desc', 'new-agent-expertise', 'new-agent-tags'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+          });
+          return;
+        }
+
+        try {
+          const res = await API.getAgent(agentName);
+          if (res.code === 0 && res.data) {
+            const agent = res.data;
+            const fullContent = agent.full_content || '';
+
+            const { meta } = parseAgentContent(fullContent);
+            if (meta) {
+              const descEl = document.getElementById('new-agent-desc');
+              const expertiseEl = document.getElementById('new-agent-expertise');
+              const tagsEl = document.getElementById('new-agent-tags');
+              if (descEl && meta.description) descEl.value = meta.description;
+              if (expertiseEl && meta.expertise) expertiseEl.value = meta.expertise;
+              if (tagsEl && meta.tags) tagsEl.value = meta.tags;
+            }
+
+            // Clear name in copied content
+            const newContent = fullContent.replace(/^(---[\s\S]*?name:\s*)([^\n]+)/m, '$1');
+            if (contentEl) contentEl.value = newContent;
+            _contentUserEdited = true;
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
+
+      await _loadTemplateAgents();
+
+      // Back button
+      document.getElementById('back-btn').addEventListener('click', () => {
+        if (window.history.length > 1) {
+          history.back();
+        } else {
+          location.href = '/';
+        }
+      });
+
+      // Cancel button
+      document.getElementById('cancel-btn').addEventListener('click', () => {
+        location.href = '/';
+      });
+
+      // Create button
+      document.getElementById('create-btn').addEventListener('click', async () => {
+        const name = document.getElementById('new-agent-name')?.value.trim();
+        const description = document.getElementById('new-agent-desc')?.value.trim();
+        const fullContent = contentEl?.value.trim();
+
+        if (!name) {
+          alert('Name 是必填项');
+          return;
+        }
+        if (!/^[a-z][a-z0-9_-]*$/.test(name)) {
+          alert('Name 必须以小写字母开头，只能包含小写字母、数字、连字符和下划线');
+          return;
+        }
+        if (!description && !fullContent) {
+          alert('请填写 Description 或完整内容');
+          return;
+        }
+
+        let finalContent = fullContent;
+        if (!finalContent) {
+          const expertise = document.getElementById('new-agent-expertise')?.value.trim() || '';
+          const tags = document.getElementById('new-agent-tags')?.value.trim() || '';
+          finalContent = generateAgentContent(name, description, expertise, tags);
+        }
+
+        // Replace name field in frontmatter
+        finalContent = finalContent.replace(/^(---[\s\S]*?name:\s*)([^\n]*)/m, `$1${name}`);
+
+        const createBtn = document.getElementById('create-btn');
+        createBtn.disabled = true;
+        createBtn.textContent = '创建中...';
+
+        try {
+          const res = await API.createAgent({ name, description, full_content: finalContent });
+          if (res.code === 0) {
+            const alias = document.getElementById('new-agent-alias')?.value.trim() || '';
+            if (alias) await API.setAgentLabel(name, alias);
+            location.href = '/';
+          } else {
+            alert(`创建失败: ${res.message}`);
+            createBtn.disabled = false;
+            createBtn.textContent = '创建 Agent';
+          }
+        } catch (err) {
+          alert(`创建失败: ${err.message}`);
+          createBtn.disabled = false;
+          createBtn.textContent = '创建 Agent';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

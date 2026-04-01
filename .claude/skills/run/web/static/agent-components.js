@@ -290,14 +290,15 @@ function renderAgentCreateForm() {
   return `
     <div class="modal-title">Create New Agent</div>
     <div class="form-group">
-      <label class="form-label">Copy from existing agent</label>
+      <label class="form-label">复制自（继承内容）</label>
       <select class="input-field" id="new-agent-template">
         <option value="">— none (blank template) —</option>
       </select>
+      <div class="form-hint">选择后将继承该 agent 的描述、专长、标签和内容</div>
     </div>
     <div class="form-group">
       <label class="form-label">Name <span class="form-hint">（系统内部识别用，仅小写字母/数字/连字符）</span></label>
-      <input class="input-field" id="new-agent-name" placeholder="lowercase-with-dashes" pattern="^[a-z][a-z0-9_-]*$">
+      <input class="input-field" id="new-agent-name" placeholder="lowercase-with-dashes">
     </div>
     <div class="form-group">
       <label class="form-label">别名 <span class="form-hint">（可选，仅在网页上显示，留空则显示原名）</span></label>

@@ -118,48 +118,7 @@ let _modalContentUserEdited = false;
 let _modalEscapeListener = null;
 
 function showCreateAgentModal() {
-  let overlay = document.getElementById('modal-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'modal-overlay';
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal-content" id="modal-content"></div>';
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeModal();
-    });
-  }
-
-  _modalContentUserEdited = false;
-  document.getElementById('modal-content').innerHTML = renderAgentCreateForm();
-  requestAnimationFrame(() => overlay.classList.add('open'));
-
-  const cancelBtn = document.getElementById('modal-cancel-btn');
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
-  const contentEl = document.getElementById('new-agent-content');
-  if (contentEl) {
-    contentEl.value = generateAgentContent('', '', '', '');
-  }
-
-  ['new-agent-name', 'new-agent-desc', 'new-agent-expertise', 'new-agent-tags'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', _onModalFieldInput);
-  });
-
-  if (contentEl) {
-    contentEl.addEventListener('input', () => { _modalContentUserEdited = true; });
-  }
-
-  if (_modalEscapeListener) {
-    document.removeEventListener('keydown', _modalEscapeListener);
-  }
-  _modalEscapeListener = (e) => {
-    if (e.key === 'Escape') closeModal();
-  };
-  document.addEventListener('keydown', _modalEscapeListener);
-
-  _loadModalTemplateAgents();
+  window.location.href = '/create-agent';
 }
 
 function _onModalFieldInput() {
@@ -248,6 +207,10 @@ async function createAgent() {
 
   if (!name) {
     alert('Name is required');
+    return;
+  }
+  if (!/^[a-z][a-z0-9_-]*$/.test(name)) {
+    alert('Name must start with a letter and contain only lowercase letters, numbers, hyphens and underscores');
     return;
   }
   if (!description && !fullContent) {
