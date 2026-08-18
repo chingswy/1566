@@ -1,3 +1,5 @@
+
+
 <p align="center">
   <img src=".claude/skills/run/wanshoudijun.png" />
 </p>
@@ -39,7 +41,7 @@
 **极简主义安装**：打开Claude Code，输入：
 
 ```
-> 从 Github远程仓库安装 skill：仓库地址：https://github.com/chingswy/1566 ，skill目录：`.claude/skills/run`；安装后打开网页服务，运行脚本 `bash .claude/skills/run/start.sh`
+> 从 Github远程仓库安装 skill：仓库地址：https://github.com/chingswy/1566 ，skill目录：`.claude/skills/run`；安装后打开网页服务，运行脚本 `bash .claude/skills/run/start.sh`（默认端口 8192）
 ```
 
 > **⚠️ 注意（无 gh 命令的环境）**：如果环境中没有安装 `gh` CLI，Claude Code 会自动降级使用 `git clone`。实际安装逻辑等价于：
