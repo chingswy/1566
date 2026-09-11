@@ -303,8 +303,14 @@
           const completed = (completedRes.data || []);
           const failed = (failedRes.data || []);
 
-          // Merge and sort descending by updated_at
-          allTasks = [...completed, ...failed].sort((a, b) => {
+          // Merge and deduplicate by task.id, then sort descending by updated_at
+          const seenIds = new Set();
+          const merged = [...completed, ...failed].filter(t => {
+            if (seenIds.has(t.id)) return false;
+            seenIds.add(t.id);
+            return true;
+          });
+          allTasks = merged.sort((a, b) => {
             const da = new Date(a.updated_at || a.created_at);
             const db = new Date(b.updated_at || b.created_at);
             return db - da;
@@ -337,6 +343,13 @@
       } else {
         loadHistory();
       }
+
+      // Dynamic page title: fetch project name from backend
+      fetch('/api/project-info').then(r => r.json()).then(res => {
+        if (res.code === 0 && res.data && res.data.project_name) {
+          document.title = res.data.project_name + ' · 史册';
+        }
+      }).catch(() => {});
     })();
   </script>
 </body>

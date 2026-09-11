@@ -231,3 +231,25 @@ def update_charter():
     skill_md = SKILL_DIR / "SKILL.md"
     skill_md.write_text(new_content, encoding="utf-8")
     return jsonify(ok({"updated": True}))
+
+
+# -- Roster (team_roster.md) ----------------------------------------------------------
+
+@agents_bp.route("/api/roster", methods=["GET"])
+def get_roster():
+    roster_path = SKILL_DIR / "team_roster.md"
+    if not roster_path.exists():
+        return jsonify(err("team_roster.md not found")), 404
+    content = roster_path.read_text(encoding="utf-8")
+    return jsonify(ok(content))
+
+
+# -- Project Info ----------------------------------------------------------
+
+@agents_bp.route("/api/project-info", methods=["GET"])
+def get_project_info():
+    """Return the project name (last segment of CWD) for dynamic page titles."""
+    import os
+    cwd = Path(os.getcwd())
+    project_name = cwd.name
+    return jsonify(ok({"project_name": project_name, "cwd": str(cwd)}))

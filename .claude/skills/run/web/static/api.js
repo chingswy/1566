@@ -70,6 +70,16 @@ const API = {
     return this.request('PUT', '/api/charter', { content });
   },
 
+  // Roster (team_roster.md)
+  getRoster() {
+    return this.request('GET', '/api/roster');
+  },
+
+  // Project Info
+  getProjectInfo() {
+    return this.request('GET', '/api/project-info');
+  },
+
   // Agent Labels
   setAgentLabel(name, label) {
     return this.request('PUT', '/api/agent-labels', { name, label });

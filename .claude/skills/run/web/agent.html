@@ -57,7 +57,13 @@
       }
 
       // Update page title
-      document.title = getDisplayName(name) || name;
+      document.title = (getDisplayName(name) || name) + ' · 万寿帝君';
+      // Also try to get project name for richer title
+      fetch('/api/project-info').then(r => r.json()).then(res => {
+        if (res.code === 0 && res.data && res.data.project_name) {
+          document.title = (getDisplayName(name) || name) + ' · ' + res.data.project_name;
+        }
+      }).catch(() => {});
 
       // Render page
       const root = document.getElementById('agent-standalone-root');

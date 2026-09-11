@@ -267,6 +267,13 @@ ${expertise || '列出专长领域，逗号分隔。'}
     (async function() {
       await loadAgentLabels();
 
+      // Dynamic page title
+      fetch('/api/project-info').then(r => r.json()).then(res => {
+        if (res.code === 0 && res.data && res.data.project_name) {
+          document.title = res.data.project_name + ' · 新建 Agent';
+        }
+      }).catch(() => {});
+
       const contentEl = document.getElementById('new-agent-content');
 
       // 初始化 body（模板来源选空时）

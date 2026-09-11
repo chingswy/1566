@@ -184,3 +184,137 @@
   min-height: 100vh;
   padding-bottom: 60px;
 }
+
+/* ── Roster Modal ─────────────────────────────────── */
+
+.roster-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.roster-modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.roster-modal-overlay.hidden {
+  display: none;
+}
+.roster-modal-panel {
+  width: min(540px, 92vw);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg, rgba(250,247,240,0.96));
+  border-radius: 16px;
+  overflow: hidden;
+}
+.roster-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid rgba(120,80,30,0.12);
+  flex-shrink: 0;
+}
+.roster-modal-title {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #2c1810);
+  font-family: 'Ma Shan Zheng', serif;
+}
+.roster-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-secondary, #6b5c4c);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 0.2rem;
+}
+.roster-modal-close:hover { color: #b22222; }
+.roster-modal-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 1rem 1.2rem;
+}
+.roster-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.roster-section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary, #6b5c4c);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.4rem 0 0.2rem;
+  border-bottom: 1px solid rgba(120,80,30,0.1);
+  margin-top: 0.4rem;
+}
+.roster-role-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b5c4c);
+  font-style: italic;
+  margin: 0.3rem 0 0.15rem;
+}
+.roster-member-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+.roster-member-name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #2c1810);
+  min-width: 120px;
+}
+.roster-member-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b5c4c);
+  flex: 1;
+}
+.roster-avatar {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 0.65rem !important;
+  flex-shrink: 0;
+}
+.roster-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.roster-table-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(120,80,30,0.06);
+}
+.roster-table-name {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary, #2c1810);
+  min-width: 100px;
+}
+.roster-table-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #6b5c4c);
+  flex: 1;
+}

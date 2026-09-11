@@ -53,7 +53,13 @@ async function loadTasks(triggerId) {
   try {
     const res = await API.listTasks();
     if (res.code === 0 && res.data) {
-      const newTasks = res.data;
+      // Deduplicate by task.id — keep last occurrence in case of duplicates
+      const seenIds = new Set();
+      const newTasks = res.data.filter(t => {
+        if (seenIds.has(t.id)) return false;
+        seenIds.add(t.id);
+        return true;
+      });
       const newDispatches = detectNewDispatches(state.tasks, newTasks);
 
       state.tasks = newTasks;
@@ -97,6 +103,7 @@ function renderAgentsSection() {
     sorted.forEach(agent => { html += renderAgentCard(agent); });
     html += renderAgentAddButton();
     html += '</div>';
+    html += renderRosterButton();
     html += renderCharterButton();
     container.innerHTML = html;
   } else {
@@ -386,6 +393,14 @@ async function handleClick(e) {
       break;
     }
 
+    case 'open-roster':
+      await openRosterModal();
+      break;
+
+    case 'close-roster':
+      closeRosterModal();
+      break;
+
     case 'open-charter':
       await openCharterPage();
       break;
@@ -405,5 +420,44 @@ async function handleClick(e) {
     case 'save-charter':
       await saveCharter();
       break;
+  }
+}
+
+// ── Roster Modal ─────────────────────────────────────
+
+async function openRosterModal() {
+  const res = await API.getRoster();
+  if (res.code !== 0) return;
+
+  let modal = document.getElementById('roster-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'roster-modal';
+    modal.className = 'roster-modal-overlay';
+    document.getElementById('app').appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="roster-modal-panel glass-card">
+      <div class="roster-modal-header">
+        <span class="charter-page-icon">阁</span>
+        <span class="roster-modal-title">内阁总览</span>
+        <button class="roster-modal-close" data-action="close-roster">×</button>
+      </div>
+      <div class="roster-modal-content">
+        ${renderRosterModal(res.data)}
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => { if (e.target === modal) closeRosterModal(); };
+  modal.classList.remove('hidden');
+  modal.classList.add('visible');
+}
+
+function closeRosterModal() {
+  const modal = document.getElementById('roster-modal');
+  if (modal) {
+    modal.classList.remove('visible');
+    modal.classList.add('hidden');
   }
 }

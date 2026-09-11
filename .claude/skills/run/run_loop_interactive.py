@@ -61,8 +61,8 @@ def parse_args():
         help="会话运行中轮询任务完成状态的间隔秒数（默认 30）"
     )
     parser.add_argument(
-        "--timeout", type=int, default=1200,
-        help="单次会话超时秒数（默认 1200 即 20 分钟）"
+        "--timeout", type=int, default=12000,
+        help="单次会话超时秒数（默认 12000 即 200 分钟）"
     )
     parser.add_argument(
         "--log-dir", default=None,

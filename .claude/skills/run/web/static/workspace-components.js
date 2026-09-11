@@ -82,6 +82,17 @@ function renderWorkspaceAgent(agent, activeTask, bubbleDir) {
   `;
 }
 
+// ── Roster Button ──────────────────────────────────────
+
+function renderRosterButton() {
+  return `
+    <div class="glass-card clickable charter-btn" data-action="open-roster">
+      <span class="charter-btn-icon">阁</span>
+      <span class="charter-btn-text">内阁总览</span>
+    </div>
+  `;
+}
+
 // ── Charter (SKILL.md) Button & Page ──────────────────
 
 function renderCharterButton() {
@@ -134,4 +145,99 @@ function renderCharterPage(content) {
       </div>
     </div>
   `;
+}
+
+// ── Roster Modal Rendering ─────────────────────────────
+
+function renderRosterModal(content) {
+  if (!content) return '<div class="empty-state">No roster loaded</div>';
+
+  const lines = content.split('\n');
+  let html = '<div class="roster-modal-body">';
+
+  let tableRows = [];
+  let inTable = false;
+  let inRoleGroup = false;
+
+  lines.forEach(line => {
+    // 章节标题 ##
+    if (line.startsWith('## ')) {
+      if (inTable && tableRows.length > 0) {
+        html += renderRosterTable(tableRows);
+        tableRows = [];
+        inTable = false;
+      }
+      if (inRoleGroup) {
+        html += '</div>';
+        inRoleGroup = false;
+      }
+      const sectionName = line.replace('## ', '').trim();
+      html += `<div class="roster-section-title">${escapeHtml(sectionName)}</div>`;
+    }
+    // 表格行（可调度成员）
+    else if (line.startsWith('| ') && !line.startsWith('|---')) {
+      const cols = line.split('|').filter(c => c.trim()).map(c => c.trim());
+      if (cols[0] !== 'Agent' && cols[0] !== '代号' && cols.length >= 2) {
+        tableRows.push(cols);
+        inTable = true;
+      }
+    }
+    // ### 角色块（核心角色）
+    else if (line.startsWith('### ')) {
+      if (inTable && tableRows.length > 0) {
+        html += renderRosterTable(tableRows);
+        tableRows = [];
+        inTable = false;
+      }
+      if (inRoleGroup) {
+        html += '</div>';
+      }
+      const roleName = line.replace('### ', '').trim();
+      html += `<div class="roster-role-group" data-role="${escapeHtml(roleName)}">`;
+      html += `<div class="roster-role-name">${escapeHtml(roleName)}</div>`;
+      inRoleGroup = true;
+    }
+    // - **xxx** — 描述
+    else if (line.match(/^- \*\*([^*]+)\*\* — (.+)/)) {
+      const m = line.match(/^- \*\*([^*]+)\*\* — (.+)/);
+      if (m) {
+        html += `<div class="roster-member-row">
+          <span class="roster-member-name">${renderInlineAvatar(m[1].trim())}${escapeHtml(m[1].trim())}</span>
+          <span class="roster-member-desc">${escapeHtml(m[2].trim())}</span>
+        </div>`;
+      }
+    }
+  });
+
+  if (inTable && tableRows.length > 0) {
+    html += renderRosterTable(tableRows);
+  }
+  if (inRoleGroup) {
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderInlineAvatar(name) {
+  const colors = AGENT_COLORS[name] || DEFAULT_COLOR;
+  const roleLabel = getRoleLabel(name);
+  const ch = (roleLabel && roleLabel[0]) || (name && name[0]) || '臣';
+  return `<span class="avatar ink-avatar avatar-sm roster-avatar" style="background:${colors.bg};color:${colors.text}">${escapeHtml(ch)}</span>`;
+}
+
+function renderRosterTable(rows) {
+  if (!rows.length) return '';
+  let html = '<div class="roster-table">';
+  rows.forEach(cols => {
+    const name = cols[0] || '';
+    const desc = cols[1] || '';
+    html += `<div class="roster-table-row">
+      <div class="roster-table-name">${renderInlineAvatar(name)}${escapeHtml(name)}</div>
+      <div class="roster-table-desc">${escapeHtml(desc)}</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
 }

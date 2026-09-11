@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Team</title>
+  <title>万寿帝君</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
@@ -98,6 +98,14 @@
   <script src="/static/task-actions.js"></script>
   <script src="/static/app.js"></script>
   <script>
+    // Dynamic page title: fetch project name from backend
+    (function() {
+      fetch('/api/project-info').then(r => r.json()).then(res => {
+        if (res.code === 0 && res.data && res.data.project_name) {
+          document.title = res.data.project_name + ' · 万寿帝君';
+        }
+      }).catch(() => {});
+    })();
     (function() {
       const quotes = [
         '没有谁是真正的贤臣，贤时用之，不贤黜之。',
